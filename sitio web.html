@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>TrueYellowDiamond</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:black;color:white;font-family:sans-serif;overflow:hidden;}
+
+/* UI */
+#lang-switch{
+  position:fixed;top:20px;right:20px;z-index:999;
+}
+#home-btn{
+  position:fixed;top:20px;right:90px;
+  z-index:999;padding:6px 12px;
+  background:cyan;color:black;border-radius:8px;
+  cursor:pointer;
+}
+
+/* INTRO */
+.intro{
+  position:fixed;width:100%;height:100vh;
+  display:flex;justify-content:center;align-items:center;
+  background:black;z-index:1000;
+  transition:opacity .8s;
+}
+.logo{display:flex;flex-direction:column;align-items:center;transition:1s;}
+.diamond{
+  width:80px;height:80px;background:yellow;
+  transform:rotate(45deg);
+  box-shadow:0 0 40px yellow;
+  animation:spin .4s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+.brand{color:yellow;font-size:2rem;margin-top:20px;}
+
+body.to-header .logo{
+  position:fixed;top:20px;left:20px;transform:scale(0.5);
+}
+
+/* SCENE */
+.scene{height:100vh;position:relative;overflow:hidden;}
+.video-wrap{position:absolute;width:100%;height:100%;z-index:2;}
+video{width:100%;height:100%;object-fit:cover;}
+
+/* PARTICLES */
+canvas{position:absolute;width:100%;height:100%;z-index:1;}
+
+/* PORTAL */
+.portal-line{
+  position:fixed;bottom:0;width:100%;height:6px;
+  background:white;z-index:5;
+  box-shadow:0 0 20px cyan,0 0 80px cyan;
+}
+body.portal-close .portal-line{
+  transform:scaleX(0);opacity:0;transition:.5s;
+}
+
+/* SUCCION */
+body.portal-finish .video-wrap{
+  transform:scale(.2) translateY(-400px);
+  opacity:0;
+  transition:.7s;
+}
+
+/* 🔥 REVERSE PORTAL */
+body.portal-reverse .games{
+  transform:translateY(100%);
+  transition:1s ease;
+}
+body.portal-reverse .video-wrap{
+  transform:scale(1) translateY(0);
+  opacity:1;
+  transition:1s ease;
+}
+body.portal-reverse .portal-line{
+  transform:scaleX(1);
+  opacity:1;
+  transition:.5s;
+}
+
+/* GAMES */
+.games{
+  position:absolute;width:100%;height:100vh;
+  background:#050510;
+  transform:translateY(100%);
+  z-index:4;
+  display:flex;flex-direction:column;align-items:center;
+}
+body.portal-active .games{
+  animation:cross 1s forwards;
+}
+@keyframes cross{to{transform:translateY(0);}}
+
+/* CAROUSEL */
+.carousel{
+  display:flex;gap:30px;
+  margin-top:60px;
+  overflow-x:auto;padding:20px;
+}
+
+/* CARD */
+.card{
+  width:260px;height:360px;
+  border-radius:20px;
+  overflow:hidden;
+  position:relative;
+  cursor:pointer;
+  transition:.4s;
+}
+.card:hover{
+  transform:scale(2);
+  z-index:50;
+}
+
+/* MEDIA */
+.card img,.card video{
+  position:absolute;width:100%;height:100%;
+  object-fit:cover;
+}
+.card video{opacity:0;transition:.4s;}
+.card:hover video{opacity:1;}
+.card:hover img{opacity:0;}
+
+/* INFO */
+.info{
+  position:absolute;bottom:12px;left:12px;z-index:3;
+}
+.info span{
+  font-size:.7rem;background:rgba(0,0,0,.6);
+  padding:3px 6px;border-radius:6px;
+}
+
+/* BOTON */
+.play-btn{
+  position:absolute;bottom:20px;right:20px;
+  background:cyan;color:black;padding:10px;
+  opacity:0;z-index:3;
+}
+.card:hover .play-btn{opacity:1;}
+
+/* TIMER */
+.card-timer{
+  position:absolute;top:0;left:0;
+  width:100%;height:100%;
+  background:rgba(180,0,0,0.35);
+  transform:scaleX(0);
+  transform-origin:left;
+  z-index:2;
+}
+
+/* SECCIONES */
+.section{
+  height:100vh;
+  display:flex;justify-content:center;align-items:center;
+  flex-direction:column;
+}
+.about{background:#0a0a20;}
+.contact{background:#111133;}
+
+footer{
+  height:120px;background:black;
+  display:flex;justify-content:center;align-items:center;
+}
+
+/* OPEN SOURCE */
+.open-source-box{
+  margin-top:40px;padding:30px;border-radius:20px;
+  background:#111133;
+  text-align:center;
+}
+.github-btn{
+  display:inline-block;margin-top:15px;
+  padding:10px 20px;background:cyan;color:black;
+  border-radius:10px;text-decoration:none;
+}
+</style>
+</head>
+
+<body>
+
+<button id="home-btn">🏠 Home</button>
+
+<select id="lang-switch">
+<option value="es">ES</option>
+<option value="en">EN</option>
+<option value="ja">JP</option>
+<option value="it">IT</option>
+<option value="fr">FR</option>
+<option value="hi">HI</option>
+</select>
+
+<div class="intro">
+  <div class="logo">
+    <div class="diamond"></div>
+    <div class="brand">trueyellowdiamond</div>
+  </div>
+</div>
+
+<section class="scene">
+
+<div class="video-wrap">
+  <video autoplay muted loop playsinline>
+    <source src="https://www.w3schools.com/howto/rain.mp4">
+  </video>
+</div>
+
+<canvas id="fx"></canvas>
+<div class="portal-line"></div>
+
+<div class="games">
+<div class="carousel">
+
+<div class="card">
+<img src="https://picsum.photos/400/600?1">
+<video muted loop>
+<source src="https://www.w3schools.com/html/mov_bbb.mp4">
+</video>
+<div class="card-timer"></div>
+<div class="info">
+<h3 data-i18n="game1">Space Duel</h3>
+<span data-i18n="genre1">Shooter</span>
+</div>
+<div class="play-btn">🎮 Jugar</div>
+</div>
+
+<div class="card">
+<img src="https://picsum.photos/400/600?2">
+<video muted loop>
+<source src="https://www.w3schools.com/html/mov_bbb.mp4">
+</video>
+<div class="card-timer"></div>
+<div class="info">
+<h3 data-i18n="game2">Neon Drift</h3>
+<span data-i18n="genre2">Arcade</span>
+</div>
+<div class="play-btn">🎮 Jugar</div>
+</div>
+
+</div>
+</div>
+</section>
+
+<section class="section about">
+<h2 data-i18n="about">Sobre nosotros</h2>
+<div class="open-source-box">
+<h3 data-i18n="opensource">Proyecto Open Source</h3>
+<p data-i18n="opensource_desc"></p>
+<a href="https://github.com/Lucas5314/space-duel-server" target="_blank" class="github-btn">
+🚀 GitHub
+</a>
+</div>
+</section>
+
+<section class="section contact" data-i18n="contact">Contacto</section>
+<footer>© 2026 TrueYellowDiamond</footer>
+
+<audio id="portalOpen" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3"></audio>
+<audio id="portalClose" src="https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.mp3"></audio>
+<audio id="portalReverse" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
+
+<script>
+
+/* HOME ÉPICO */
+const reverseSound=document.getElementById("portalReverse");
+
+document.getElementById("home-btn").onclick=()=>{
+  document.body.classList.remove("portal-close","portal-finish");
+  document.body.classList.add("portal-reverse");
+
+  reverseSound.play().catch(()=>{});
+
+  window.scrollTo({top:0,behavior:"smooth"});
+
+  setTimeout(()=>{
+    document.body.classList.remove("portal-active","portal-reverse");
+    activated=false;
+  },1000);
+};
+
+/* INTRO */
+setTimeout(()=>document.body.classList.add("to-header"),2000);
+setTimeout(()=>{
+document.querySelector(".intro").style.display="none";
+},3000);
+
+/* PARTICLES */
+const canvas=document.getElementById("fx");
+const ctx=canvas.getContext("2d");
+canvas.width=innerWidth;
+canvas.height=innerHeight;
+let particles=[];
+for(let i=0;i<120;i++){
+particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vy:-Math.random()*2});
+}
+function loop(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+particles.forEach(p=>{
+p.y+=p.vy;
+if(p.y<0){p.y=canvas.height;p.x=Math.random()*canvas.width;}
+ctx.fillStyle="cyan";
+ctx.fillRect(p.x,p.y,2,2);
+});
+requestAnimationFrame(loop);
+}
+loop();
+
+/* PORTAL */
+let activated=false;
+const openSound=document.getElementById("portalOpen");
+const closeSound=document.getElementById("portalClose");
+const games=document.querySelector(".games");
+
+function activatePortal(){
+if(activated) return;
+activated=true;
+document.body.classList.add("portal-active");
+openSound.play().catch(()=>{});
+}
+
+games.addEventListener("animationend",(e)=>{
+if(e.animationName==="cross"){
+document.body.classList.add("portal-finish");
+setTimeout(()=>{
+document.body.classList.add("portal-close");
+closeSound.play().catch(()=>{});
+document.body.style.overflow="auto";
+},700);
+}
+});
+
+window.addEventListener("wheel",(e)=>{
+if(e.deltaY>5) activatePortal();
+},{passive:true});
+
+/* CARDS */
+document.querySelectorAll(".card").forEach(card=>{
+const video=card.querySelector("video");
+const timer=card.querySelector(".card-timer");
+
+card.addEventListener("mouseenter",()=>{
+video.currentTime=0;
+video.play().catch(()=>{});
+timer.style.transition="transform 5s linear";
+timer.style.transform="scaleX(1)";
+});
+
+card.addEventListener("mouseleave",()=>{
+video.pause();
+video.currentTime=0;
+timer.style.transition="none";
+timer.style.transform="scaleX(0)";
+});
+});
+
+/* IDIOMAS */
+const translations={
+es:{game1:"Space Duel",genre1:"Shooter",game2:"Neon Drift",genre2:"Arcade",about:"Sobre nosotros",contact:"Contacto",opensource:"Proyecto Open Source",opensource_desc:"Colabora con nuestro código"},
+en:{game1:"Space Duel",genre1:"Shooter",game2:"Neon Drift",genre2:"Arcade",about:"About",contact:"Contact",opensource:"Open Source",opensource_desc:"Collaborate with our code"}
+};
+
+function setLanguage(lang){
+document.querySelectorAll("[data-i18n]").forEach(el=>{
+const key=el.getAttribute("data-i18n");
+el.textContent=translations[lang][key]||key;
+});
+}
+
+setLanguage("es");
+
+</script>
+
+</body>
+</html>
